@@ -174,7 +174,9 @@ export default function Suministros() {
                   <td className="p-3">{s.proveedor?.nombre || "-"}</td>
                   <td className="p-3">{s.proveedor?.telefono || "-"}</td>
                   <td className="p-3">{s.producto?.nombre || "-"}</td>
-                  <td className="p-3">{s.producto?.categoria?.descripcion || "-"}</td>
+                  <td className="p-3">
+                    {s.producto?.categoria?.descripcion || "-"}
+                  </td>
                   <td className="p-3">{s.descripcion || "-"}</td>
                   <td className="p-3 space-x-2">
                     <button
@@ -223,8 +225,8 @@ export default function Suministros() {
               ))}
             </select>
             <span className="text-sm text-gray-600">
-              {indexOfFirst + 1}–
-              {Math.min(indexOfLast, totalItems)} de {totalItems}
+              {indexOfFirst + 1}–{Math.min(indexOfLast, totalItems)} de{" "}
+              {totalItems}
             </span>
           </div>
 

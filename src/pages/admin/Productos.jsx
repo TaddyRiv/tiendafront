@@ -263,7 +263,10 @@ export default function Productos() {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="p-3 italic text-center text-gray-500">
+                <td
+                  colSpan="7"
+                  className="p-3 italic text-center text-gray-500"
+                >
                   No hay productos registrados.
                 </td>
               </tr>
@@ -289,8 +292,8 @@ export default function Productos() {
               ))}
             </select>
             <span className="text-sm text-gray-600">
-              {indexOfFirst + 1}–
-              {Math.min(indexOfLast, totalItems)} de {totalItems}
+              {indexOfFirst + 1}–{Math.min(indexOfLast, totalItems)} de{" "}
+              {totalItems}
             </span>
           </div>
 
