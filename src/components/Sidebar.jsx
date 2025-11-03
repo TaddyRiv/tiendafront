@@ -8,7 +8,9 @@ import {
   BarChart,
   Menu,
   LogOut,
+  PackagePlus
 } from "lucide-react"; 
+
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
@@ -18,7 +20,10 @@ const Sidebar = () => {
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin" },
     { name: "Usuarios", icon: <UserCircle size={20} />, path: "/admin/usuarios" },
     { name: "Clientes", icon: <Users size={20} />, path: "/admin/clientes" },
+    { name: "proveedores", icon: <Users size={20} />, path: "/admin/proveedores" },
+    { name: "Categorias", icon: <ShoppingBag size={20} />, path: "/admin/categorias" },
     { name: "Productos", icon: <ShoppingBag size={20} />, path: "/admin/productos" },
+    { name: "Suministros", icon: <PackagePlus size={20} />, path: "/admin/suministros" },
     { name: "Ventas", icon: <BarChart size={20} />, path: "/admin/ventas" },
     { name: "Reportes", icon: <BarChart size={20} />, path: "/admin/reportes" },
   ];
@@ -60,7 +65,7 @@ const Sidebar = () => {
 
       {/* Logout */}
       <div className="p-4 border-t border-blue-600">
-        <button className="flex items-center gap-3 w-full hover:bg-blue-600 p-2 rounded-md">
+        <button className="flex items-center w-full gap-3 p-2 rounded-md hover:bg-blue-600">
           <LogOut size={20} />
           <span className={`${!open && "hidden"}`}>Cerrar sesión</span>
         </button>

@@ -6,26 +6,27 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminLayout from "./layouts/AdminLayout";
 import Usuarios from "./pages/admin/Usuarios";
+import Proveedores from "./pages/admin/proveedores";
+import Categorias from "./pages/admin/categorias";
+import Productos from "./pages/admin/Productos";
+import Suministros from "./pages/admin/suministros";
 
 function App() {
   return (
-    <AuthProvider> {/* Sesión global */}
-      <CartProvider> {/* Carrito global */}
+    <AuthProvider>
+      {" "}
+      {/* Sesión global */}
+      <CartProvider>
+        {" "}
+        {/* Carrito global */}
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
 
             {/* Panel administrativo */}
-             <Route
-              path="/admin"
-              element={
-                <AdminLayout>
-                </AdminLayout>
-              }
-            />
+            <Route path="/admin" element={<AdminLayout></AdminLayout>} />
             <Route
               path="/admin/usuarios"
               element={
@@ -44,13 +45,38 @@ function App() {
               }
             />
             <Route
-              path="/admin/productos"
+              path="/admin/proveedores"
               element={
                 <AdminLayout>
-                  <h1>Gestión de Productos</h1>
+                  <Proveedores />
                 </AdminLayout>
               }
             />
+            <Route
+              path="/admin/categorias"
+              element={
+                <AdminLayout>
+                  <Categorias />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/productos"
+              element={
+                <AdminLayout>
+                  <Productos />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/suministros"
+              element={
+                <AdminLayout>
+                  <Suministros />
+                </AdminLayout>
+              }
+            />
+
             <Route
               path="/admin/ventas"
               element={
