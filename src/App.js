@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminLayout from "./layouts/AdminLayout";
+import Usuarios from "./pages/admin/Usuarios";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
 
             {/* Panel administrativo */}
              <Route
@@ -28,6 +30,7 @@ function App() {
               path="/admin/usuarios"
               element={
                 <AdminLayout>
+                  <Usuarios />
                   <h1>Gestión de Usuarios</h1>
                 </AdminLayout>
               }
