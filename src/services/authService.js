@@ -4,6 +4,9 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 export const login = async (email, password) => {
   const response = await axios.post(`${API_URL}/login/`, { email, password });
+  if (response.data.access) {
+    localStorage.setItem("access_token", response.data.access);
+  }
   return response.data;
 };
 
