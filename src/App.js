@@ -6,7 +6,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminLayout from "./layouts/AdminLayout";
 import Usuarios from "./pages/admin/Usuarios";
-
+import Reportes from "./pages/admin/Reportes";
+import Dinamico from "./pages/admin/Dinamico";
 function App() {
   return (
     <AuthProvider> {/* Sesión global */}
@@ -31,15 +32,6 @@ function App() {
               element={
                 <AdminLayout>
                   <Usuarios />
-                  <h1>Gestión de Usuarios</h1>
-                </AdminLayout>
-              }
-            />
-            <Route
-              path="/admin/clientes"
-              element={
-                <AdminLayout>
-                  <h1>Gestión de Clientes</h1>
                 </AdminLayout>
               }
             />
@@ -63,7 +55,15 @@ function App() {
               path="/admin/reportes"
               element={
                 <AdminLayout>
-                  <h1>Reportes</h1>
+                  <Reportes />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/reportes/dinamico"
+              element={
+                <AdminLayout>
+                  <Dinamico />
                 </AdminLayout>
               }
             />
