@@ -20,6 +20,7 @@ export default function Productos() {
   });
   const [preview, setPreview] = useState(null);
   const [editId, setEditId] = useState(null);
+  const [zoomUrl, setZoomUrl] = useState(null); // 👈 nueva variable para el zoom
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,7 +49,7 @@ export default function Productos() {
     }
   };
 
-  // 🧩 Crear o actualizar producto
+  // Crear o actualizar producto
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -83,7 +84,6 @@ export default function Productos() {
     }
   };
 
-  // ✏️ Editar producto
   const handleEdit = (p) => {
     setForm({
       nombre: p.nombre,
@@ -97,7 +97,6 @@ export default function Productos() {
     setEditId(p.id);
   };
 
-  // 🗑️ Eliminar producto
   const handleDelete = async (id) => {
     if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
       try {
@@ -109,14 +108,14 @@ export default function Productos() {
     }
   };
 
-  // 📸 Manejo de archivo
+  // Manejo de archivo
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setForm({ ...form, foto: file });
     setPreview(URL.createObjectURL(file));
   };
 
-  // 🔢 Paginación
+  // Paginación
   const totalItems = productos.length;
   const totalPages = Math.ceil(totalItems / rowsPerPage);
   const indexOfLast = currentPage * rowsPerPage;
@@ -136,7 +135,7 @@ export default function Productos() {
     <div className="p-6">
       <h1 className="mb-4 text-2xl font-bold">Gestión de productos</h1>
 
-      {/* 🧱 Formulario */}
+      {/* Formulario */}
       <form
         onSubmit={handleSubmit}
         className="flex flex-wrap items-center gap-3 p-4 mb-6 bg-white rounded shadow"
@@ -179,7 +178,7 @@ export default function Productos() {
           ))}
         </select>
 
-        {/* 📸 Subida de imagen compacta */}
+        {/* Subida de imagen */}
         <div className="flex items-center gap-2 p-2 transition border rounded bg-gray-50 hover:border-blue-400">
           <label className="px-3 py-1 text-sm text-white bg-blue-600 rounded shadow-sm cursor-pointer hover:bg-blue-700">
             Subir foto
@@ -211,7 +210,7 @@ export default function Productos() {
         </button>
       </form>
 
-      {/* 📋 Tabla de productos */}
+      {/* Tabla */}
       <div className="overflow-x-auto bg-white rounded shadow">
         <table className="w-full text-left">
           <thead className="text-white bg-blue-700">
@@ -235,7 +234,8 @@ export default function Productos() {
                       <img
                         src={p.foto}
                         alt={p.nombre}
-                        className="object-cover w-12 h-12 border rounded"
+                        className="object-cover w-12 h-12 border rounded cursor-zoom-in"
+                        onClick={() => setZoomUrl(p.foto)} // 👈 click para zoom
                       />
                     ) : (
                       <span className="italic text-gray-400">Sin foto</span>
@@ -275,7 +275,7 @@ export default function Productos() {
         </table>
       </div>
 
-      {/* 🔢 Paginación */}
+      {/* Paginación */}
       {totalItems > 0 && (
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2">
@@ -345,6 +345,31 @@ export default function Productos() {
             >
               ⏭
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* 🖼️ Modal de zoom */}
+      {zoomUrl && (
+        <div
+          onClick={() => setZoomUrl(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-4xl max-h-[85vh]"
+          >
+            <button
+              onClick={() => setZoomUrl(null)}
+              className="absolute px-3 py-1 text-gray-800 bg-white rounded shadow top-2 right-2"
+            >
+              Cerrar ✕
+            </button>
+            <img
+              src={zoomUrl}
+              alt="zoom"
+              className="object-contain w-[90vw] max-w-4xl max-h-[85vh] bg-white rounded"
+            />
           </div>
         </div>
       )}
