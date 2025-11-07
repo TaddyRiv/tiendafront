@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import http from "../../services/http"; // ✅ usamos solo esta instancia
+import http from "../../services/http"; 
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -62,6 +62,22 @@ const exportToPDF = (data, filename = "reporte.pdf") => {
     console.error("Error exportando a PDF:", err);
     alert("Error al exportar a PDF");
   }
+};
+
+// Formatea valores para celdas de tabla: convierte objetos a JSON, booleans a Sí/No,
+// y trunca strings muy largos para evitar roturas de layout.
+const formatCell = (v, max = 300) => {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "object") {
+    try {
+      const s = JSON.stringify(v);
+      return s.length > max ? s.slice(0, max) + "…" : s;
+    } catch (err) {
+      return String(v);
+    }
+  }
+  if (typeof v === "boolean") return v ? "Sí" : "No";
+  return String(v);
 };
 
 const Dinamico = () => {
@@ -213,7 +229,6 @@ const Dinamico = () => {
               </pre>
             </div>
 
-            {/* 📈 Datos del Reporte */}
             <div className="bg-white rounded-lg shadow p-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold text-gray-700 flex items-center gap-2">
@@ -225,7 +240,7 @@ const Dinamico = () => {
                     onClick={() => exportToExcel(respuestaIA.datos, "reporte_ia.xlsx")}
                     className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
                   >
-                    📗 Exportar Excel
+                    📗 Exportar Excel 
                   </button>
                   <button
                     onClick={() => exportToPDF(respuestaIA.datos, "reporte_ia.pdf")}
@@ -236,30 +251,42 @@ const Dinamico = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm border border-gray-200">
-                  <thead className="bg-gray-100 border-b">
-                    <tr>
-                      {Object.keys(respuestaIA.datos[0] || {}).map((key) => (
-                        <th key={key} className="text-left px-3 py-2 font-semibold">
-                          {key.replace(/_/g, " ").toUpperCase()}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {respuestaIA.datos.map((fila, i) => (
-                      <tr key={i} className="border-b hover:bg-gray-50">
-                        {Object.values(fila).map((valor, j) => (
-                          <td key={j} className="px-3 py-2">
-                            {valor}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {respuestaIA.datos ? (
+                <div className="overflow-x-auto">
+                  {(() => {
+                    const datosArray = Array.isArray(respuestaIA.datos)
+                      ? respuestaIA.datos
+                      : [respuestaIA.datos];
+
+                    return (
+                      <table className="w-full text-sm border border-gray-200">
+                        <thead className="bg-gray-100 border-b">
+                          <tr>
+                            {Object.keys(datosArray[0] || {}).map((key) => (
+                              <th key={key} className="text-left px-3 py-2 font-semibold">
+                                {key.replace(/_/g, " ").toUpperCase()}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {datosArray.map((fila, i) => (
+                            <tr key={i} className="border-b hover:bg-gray-50">
+                              {Object.values(fila).map((valor, j) => (
+                                <td key={j} className="px-3 py-2">
+                                  {formatCell(valor)}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    );
+                  })()}
+                </div>
+              ) : (
+                <div className="text-gray-500 text-sm">Sin datos disponibles</div>
+              )}
             </div>
 
             {/* 💬 Respuesta natural */}
