@@ -19,7 +19,6 @@ const Sidebar = () => {
   const menuItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin" },
     { name: "Usuarios", icon: <UserCircle size={20} />, path: "/admin/usuarios" },
-    { name: "Clientes", icon: <Users size={20} />, path: "/admin/clientes" },
     { name: "proveedores", icon: <Users size={20} />, path: "/admin/proveedores" },
     { name: "Categorias", icon: <ShoppingBag size={20} />, path: "/admin/categorias" },
     { name: "Productos", icon: <ShoppingBag size={20} />, path: "/admin/productos" },
