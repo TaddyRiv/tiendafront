@@ -1,22 +1,34 @@
 import React from "react";
+import { useCart } from "../context/CartContext";
 
 const ProductCard = ({ producto }) => {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart(producto);
+    // Opcional: mostrar notificación
+    //alert(`✅ ${producto.nombre} agregado al carrito`);
+  };
+
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition duration-300">
+    <div className="p-4 transition duration-300 bg-white rounded-lg shadow-md hover:shadow-lg">
       <img
         src={producto.imagen || "https://via.placeholder.com/300x200"}
         alt={producto.nombre}
-        className="w-full h-48 object-cover rounded-md mb-3"
+        className="object-cover w-full h-48 mb-3 rounded-md"
       />
       <h3 className="text-lg font-semibold text-gray-800">{producto.nombre}</h3>
-      <p className="text-gray-600 text-sm mt-1 line-clamp-2">
+      <p className="mt-1 text-sm text-gray-600 line-clamp-2">
         {producto.descripcion || "Sin descripción"}
       </p>
-      <div className="flex justify-between items-center mt-3">
-        <span className="text-blue-600 font-bold text-lg">
+      <div className="flex items-center justify-between mt-3">
+        <span className="text-lg font-bold text-blue-600">
           Bs. {producto.precio}
         </span>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm">
+        <button 
+          onClick={handleAddToCart}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm"
+        >
           Añadir al carrito
         </button>
       </div>
