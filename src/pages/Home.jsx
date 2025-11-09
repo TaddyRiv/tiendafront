@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { getProductos } from "../services/productService";
+import { getProductos } from "../services/productoService";
 import ProductCard from "../components/ProductCard";
 
 const Home = () => {

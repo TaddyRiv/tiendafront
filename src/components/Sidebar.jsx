@@ -1,28 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  ShoppingBag,
-  Users,
   UserCircle,
   BarChart,
   Menu,
   LogOut,
-  PackagePlus
-} from "lucide-react"; 
-
+  PackagePlus,
+  Package,
+  ChevronDown,
+  ChevronRight,
+  Truck,
+  Tag,
+  Boxes
+} from "lucide-react";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
+  const [openInventario, setOpenInventario] = useState(false);
   const location = useLocation();
 
-  const menuItems = [
+  // Mantener el submenú abierto si estás dentro de alguna de sus rutas
+  useEffect(() => {
+    if (
+      location.pathname.includes("categorias") ||
+      location.pathname.includes("productos") ||
+      location.pathname.includes("proveedores") ||
+      location.pathname.includes("suministros")
+    ) {
+      setOpenInventario(true);
+    }
+  }, [location]);
+
+  // Menús principales fuera del grupo inventario
+  const mainItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin" },
     { name: "Usuarios", icon: <UserCircle size={20} />, path: "/admin/usuarios" },
-    { name: "proveedores", icon: <Users size={20} />, path: "/admin/proveedores" },
-    { name: "Categorias", icon: <ShoppingBag size={20} />, path: "/admin/categorias" },
-    { name: "Productos", icon: <ShoppingBag size={20} />, path: "/admin/productos" },
-    { name: "Suministros", icon: <PackagePlus size={20} />, path: "/admin/suministros" },
     { name: "Ventas", icon: <BarChart size={20} />, path: "/admin/ventas" },
     { name: "Reportes", icon: <BarChart size={20} />, path: "/admin/reportes" },
   ];
@@ -43,7 +56,7 @@ const Sidebar = () => {
 
       {/* Menú */}
       <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item, index) => {
+        {mainItems.map((item, index) => {
           const active = location.pathname === item.path;
           return (
             <Link
@@ -60,6 +73,54 @@ const Sidebar = () => {
             </Link>
           );
         })}
+
+        {/* 🔽 Grupo Inventario */}
+        <div>
+          <button
+            onClick={() => setOpenInventario(!openInventario)}
+            className={`flex items-center justify-between w-full p-2 rounded-md hover:bg-blue-600 ${
+              openInventario ? "bg-blue-600" : "text-blue-100"
+            }`}
+          >
+            <span className="flex items-center gap-3">
+              <Package size={20} />
+              <span className={`${!open && "hidden"}`}>Inventario</span>
+            </span>
+            {open && (openInventario ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+          </button>
+
+          {openInventario && (
+            <div className={`ml-6 mt-1 flex flex-col space-y-1 ${!open && "hidden"}`}>
+              <Link
+                to="/admin/categorias"
+                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
+              >
+                <Tag size={16} /> Categorías
+              </Link>
+
+              <Link
+                to="/admin/productos"
+                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
+              >
+                <Boxes size={16} /> Productos
+              </Link>
+
+              <Link
+                to="/admin/proveedores"
+                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
+              >
+                <Truck size={16} /> Proveedores
+              </Link>
+
+              <Link
+                to="/admin/suministros"
+                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
+              >
+                <PackagePlus size={16} /> Suministros
+              </Link>
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* Logout */}
