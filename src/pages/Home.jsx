@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { getProductos } from "../services/productoService";
+import CartSidebar from "../components/CartSidebar"; // 👈 NUEVO
+import { getProductos } from "../services/productService";
 import ProductCard from "../components/ProductCard";
 
 const Home = () => {
@@ -24,27 +26,28 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
       <Navbar />
+      <CartSidebar /> {/* 👈 AGREGAMOS ESTO */}
 
-      <section className="max-w-7xl mx-auto py-16 px-4 text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-3">
+      <section className="px-4 py-16 mx-auto text-center max-w-7xl">
+        <h1 className="mb-3 text-4xl font-bold text-gray-800">
           Bienvenido a <span className="text-blue-600">TiendaFront</span>
         </h1>
-        <p className="text-gray-600 mb-8">
+        <p className="mb-8 text-gray-600">
           Encuentra los mejores productos para ti, con estilo y comodidad.
         </p>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 pb-16">
+      <section className="px-4 pb-16 mx-auto max-w-7xl">
         {loading ? (
           <p className="text-center text-gray-600">Cargando productos...</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
             {productos.length > 0 ? (
               productos.map((producto) => (
                 <ProductCard key={producto.id} producto={producto} />
               ))
             ) : (
-              <p className="col-span-full text-center text-gray-500">
+              <p className="text-center text-gray-500 col-span-full">
                 No hay productos disponibles.
               </p>
             )}
