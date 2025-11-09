@@ -13,6 +13,7 @@ import Categorias from "./pages/admin/categorias";
 import Productos from "./pages/admin/Productos";
 import Suministros from "./pages/admin/suministros";
 import {VentasPage} from "./pages/admin/ventas";
+import ReportesPrediccion from "./pages/admin/ReportesPrediccion";
 
 function App() {
   return (
@@ -91,6 +92,14 @@ function App() {
               element={
                 <AdminLayout>
                   <Dinamico />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/reportes/prediccion"
+              element={
+                <AdminLayout>
+                  <ReportesPrediccion />
                 </AdminLayout>
               }
             />

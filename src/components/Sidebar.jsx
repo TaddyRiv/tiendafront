@@ -12,15 +12,18 @@ import {
   ChevronRight,
   Truck,
   Tag,
-  Boxes
+  Boxes,
+  FileText,
+  LineChart
 } from "lucide-react";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
   const [openInventario, setOpenInventario] = useState(false);
+  const [openReportes, setOpenReportes] = useState(false);
   const location = useLocation();
 
-  // Mantener el submenú abierto si estás dentro de alguna de sus rutas
+  // Mantener submenús abiertos si estás dentro de sus rutas
   useEffect(() => {
     if (
       location.pathname.includes("categorias") ||
@@ -30,14 +33,21 @@ const Sidebar = () => {
     ) {
       setOpenInventario(true);
     }
+
+    if (
+      location.pathname.includes("reportes/standar") ||
+      location.pathname.includes("reportes/personalizados") ||
+      location.pathname.includes("reportes/prediccion")
+    ) {
+      setOpenReportes(true);
+    }
   }, [location]);
 
-  // Menús principales fuera del grupo inventario
+  // Menús principales fuera de los grupos
   const mainItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin" },
     { name: "Usuarios", icon: <UserCircle size={20} />, path: "/admin/usuarios" },
     { name: "Ventas", icon: <BarChart size={20} />, path: "/admin/ventas" },
-    { name: "Reportes", icon: <BarChart size={20} />, path: "/admin/reportes" },
   ];
 
   return (
@@ -91,32 +101,52 @@ const Sidebar = () => {
 
           {openInventario && (
             <div className={`ml-6 mt-1 flex flex-col space-y-1 ${!open && "hidden"}`}>
-              <Link
-                to="/admin/categorias"
-                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
-              >
+              <Link to="/admin/categorias" className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600">
                 <Tag size={16} /> Categorías
               </Link>
 
-              <Link
-                to="/admin/productos"
-                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
-              >
+              <Link to="/admin/productos" className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600">
                 <Boxes size={16} /> Productos
               </Link>
 
-              <Link
-                to="/admin/proveedores"
-                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
-              >
+              <Link to="/admin/proveedores" className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600">
                 <Truck size={16} /> Proveedores
               </Link>
 
-              <Link
-                to="/admin/suministros"
-                className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600"
-              >
+              <Link to="/admin/suministros" className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600">
                 <PackagePlus size={16} /> Suministros
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* 🔽 Grupo Reportes */}
+        <div>
+          <button
+            onClick={() => setOpenReportes(!openReportes)}
+            className={`flex items-center justify-between w-full p-2 rounded-md hover:bg-blue-600 ${
+              openReportes ? "bg-blue-600" : "text-blue-100"
+            }`}
+          >
+            <span className="flex items-center gap-3">
+              <BarChart size={20} />
+              <span className={`${!open && "hidden"}`}>Reportes</span>
+            </span>
+            {open && (openReportes ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+          </button>
+
+          {openReportes && (
+            <div className={`ml-6 mt-1 flex flex-col space-y-1 ${!open && "hidden"}`}>
+              <Link to="/admin/reportes" className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600">
+                <FileText size={16} /> Reportes estándar
+              </Link>
+
+              <Link to="/admin/reportes/dinamico" className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600">
+                <FileText size={16} /> Reportes dinámicos
+              </Link>
+
+              <Link to="/admin/reportes/prediccion" className="flex items-center gap-2 p-2 rounded-md hover:bg-blue-600">
+                <LineChart size={16} /> Predicción
               </Link>
             </div>
           )}
