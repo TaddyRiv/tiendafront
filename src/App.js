@@ -12,7 +12,7 @@ import Proveedores from "./pages/admin/proveedores";
 import Categorias from "./pages/admin/categorias";
 import Productos from "./pages/admin/Productos";
 import Suministros from "./pages/admin/suministros";
-import Ventas from "./pages/admin/ventas";
+import {VentasPage} from "./pages/admin/ventas";
 
 function App() {
   return (
@@ -74,7 +74,7 @@ function App() {
               path="/admin/ventas"
               element={
                 <AdminLayout>
-                  <Ventas />
+                  <VentasPage />
                 </AdminLayout>
               }
             />

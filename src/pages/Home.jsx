@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { getProductos } from "../services/productoService";
 import CartSidebar from "../components/CartSidebar"; // 👈 NUEVO
 import { getProductos } from "../services/productService";
 import ProductCard from "../components/ProductCard";
