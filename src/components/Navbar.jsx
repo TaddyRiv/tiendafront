@@ -1,57 +1,83 @@
-import React from "react";
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../context/CartContext"; // 👈 importa el contexto
 
-const Navbar = () => {
-  const { cart, setIsCartOpen } = useCart(); // 👈 Agregamos setIsCartOpen
-  const itemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+function Navbar() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const { setIsCartOpen, cart } = useCart(); // 👈 para abrir el carrito y contar items
+
+  const itemCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
 
   return (
-    <nav className="flex items-center justify-between px-10 py-4 bg-white shadow-md">
-      <Link to="/" className="text-2xl font-bold text-blue-700">
-        TiendaFront 🛒
+    <nav className="flex justify-between items-center px-8 py-4 bg-white shadow">
+      {/* Logo */}
+      <Link to="/" className="text-2xl font-bold text-blue-600">
+        Tienda Ropa SI2
       </Link>
 
+      {/* Enlaces de navegación */}
       <div className="flex items-center gap-6">
-        <Link to="/" className="font-medium hover:text-blue-700">
+        <Link to="/" className="hover:text-blue-600 font-medium">
           Inicio
         </Link>
-        <Link to="/productos" className="font-medium hover:text-blue-700">
+        <Link to="/productos" className="hover:text-blue-600 font-medium">
           Productos
         </Link>
-        <Link to="/contacto" className="font-medium hover:text-blue-700">
-          Contacto
-        </Link>
+
+        {/* Visible sólo si hay usuario */}
+        {user && (
+          <Link
+            to="/mis-compras"
+            className="hover:text-blue-600 font-medium"
+          >
+            Mis Compras
+          </Link>
+        )}
       </div>
 
-      <div className="flex items-center gap-3">
-        <Link
-          to="/login"
-          className="px-4 py-2 text-blue-600 transition border border-blue-600 rounded hover:bg-blue-50"
-        >
-          Iniciar Sesión
-        </Link>
-        <Link
-          to="/register"
-          className="px-4 py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700"
-        >
-          Registrarse
-        </Link>
+      {/* Área derecha */}
+      <div className="flex items-center gap-4">
+        <span className="text-gray-700">
+          Hola, {user ? user.username : "invitado"}
+        </span>
 
-        <button 
-          onClick={() => setIsCartOpen(true)} // 👈 AGREGAMOS ESTO
-          className="relative px-4 py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700"
-        >
-          🛒 Carrito
-          {itemCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-xs rounded-full px-2 py-0.5">
-              {itemCount}
-            </span>
-          )}
-        </button>
+        {user ? (
+          <>
+            <button
+              onClick={handleLogout}
+              className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+            >
+              Cerrar sesión
+            </button>
+
+            {/* 👇 Botón que usa el contexto del carrito */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            >
+              🛒 Carrito
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-xs rounded-full px-2 py-0.5">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/login"
+            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+          >
+            Iniciar sesión
+          </Link>
+        )}
       </div>
     </nav>
   );
-};
+}
 
 export default Navbar;
