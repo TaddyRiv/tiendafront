@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -13,99 +14,125 @@ import Proveedores from "./pages/admin/proveedores";
 import Categorias from "./pages/admin/categorias";
 import Productos from "./pages/admin/Productos";
 import Suministros from "./pages/admin/suministros";
-import {VentasPage} from "./pages/admin/ventas";
+import { VentasPage } from "./pages/admin/ventas";
 import ReportesPrediccion from "./pages/admin/ReportesPrediccion";
+import StripeCheckout from "./components/StripeCheckout";
+import MisComprasPage from "./pages/MisCompras";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <AuthProvider>
-      {" "}
-      {/* Sesión global */}
       <CartProvider>
-        {" "}
-        {/* Carrito global */}
         <Router>
           <Routes>
+            {/* 🔹 RUTAS PÚBLICAS */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            {/* Panel administrativo */}
+            <Route
+              path="/checkout"
+              element={<StripeCheckout onSuccess={() => window.location.replace("/")} />}
+            />
+            <Route path="/mis-compras" element={<MisComprasPage />} />
+
+            {/* 🔒 RUTAS ADMIN PROTEGIDAS */}
+
              <Route path="/admin" element={
-              <AdminLayout>
-                <Dashboard />
-              </AdminLayout>
+              <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                <AdminLayout>
+                  <Dashboard />
+                </AdminLayout>
+              </ProtectedRoute>
             } />
             <Route
               path="/admin/usuarios"
               element={
-                <AdminLayout>
-                  <Usuarios />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <Usuarios />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/proveedores"
               element={
-                <AdminLayout>
-                  <Proveedores />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <Proveedores />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/categorias"
               element={
-                <AdminLayout>
-                  <Categorias />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <Categorias />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/productos"
               element={
-                <AdminLayout>
-                  <Productos />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <Productos />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/suministros"
               element={
-                <AdminLayout>
-                  <Suministros />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <Suministros />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
-           
             <Route
               path="/admin/ventas"
               element={
-                <AdminLayout>
-                  <VentasPage />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <VentasPage />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/reportes"
               element={
-                <AdminLayout>
-                  <Reportes />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <Reportes />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/reportes/dinamico"
               element={
-                <AdminLayout>
-                  <Dinamico />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <Dinamico />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/reportes/prediccion"
               element={
-                <AdminLayout>
-                  <ReportesPrediccion />
-                </AdminLayout>
+                <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                  <AdminLayout>
+                    <ReportesPrediccion />
+                  </AdminLayout>
+                </ProtectedRoute>
               }
             />
           </Routes>
