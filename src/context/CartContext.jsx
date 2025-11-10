@@ -4,6 +4,7 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false); // 👈 NUEVO
 
   // Agregar un producto
   const addToCart = (product) => {
@@ -26,11 +27,37 @@ export const CartProvider = ({ children }) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id));
   };
 
+  // Actualizar cantidad 👈 NUEVO
+  const updateQuantity = (id, newQuantity) => {
+    if (newQuantity < 1) return;
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
+
   // Vaciar carrito
   const clearCart = () => setCart([]);
 
+  // Calcular total 👈 NUEVO
+  const getTotalPrice = () => {
+    return cart.reduce((total, item) => total + item.precio * item.quantity, 0);
+  };
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity, // 👈 NUEVO
+        clearCart,
+        getTotalPrice, // 👈 NUEVO
+        isCartOpen, // 👈 NUEVO
+        setIsCartOpen, // 👈 NUEVO
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
