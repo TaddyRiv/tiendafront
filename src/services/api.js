@@ -71,24 +71,28 @@ export async function getDashboardMetrics() {
 
       // ingresos
       if (typeof raw.ingresos === "number") defaults.ingresos = raw.ingresos;
-      else if (typeof raw.total_ingresos === "number") defaults.ingresos = raw.total_ingresos;
+      else if (typeof raw.total_ingresos === "number")
+        defaults.ingresos = raw.total_ingresos;
     }
 
     // Productos: preferir conteo del endpoint de productos (paginado o lista)
     try {
       const p = await api.get(endpoints.productos);
       if (Array.isArray(p.data)) defaults.productos = p.data.length;
-      else if (p.data && typeof p.data.count === "number") defaults.productos = p.data.count;
+      else if (p.data && typeof p.data.count === "number")
+        defaults.productos = p.data.count;
     } catch (err) {
       // fallbacks: si raw trae productos_count
-      if (raw && typeof raw.productos_count === "number") defaults.productos = raw.productos_count;
+      if (raw && typeof raw.productos_count === "number")
+        defaults.productos = raw.productos_count;
     }
 
     // Clientes: intentar conteo en /usuarios/ (endpoints.register)
     try {
       const u = await api.get(endpoints.register);
       if (Array.isArray(u.data)) defaults.clientes = u.data.length;
-      else if (u.data && typeof u.data.count === "number") defaults.clientes = u.data.count;
+      else if (u.data && typeof u.data.count === "number")
+        defaults.clientes = u.data.count;
     } catch (err) {
       // dejar 0 si no es accesible
     }
@@ -109,7 +113,8 @@ export async function getVentasDiarias() {
     const raw = resp.data || [];
     // Normalizar cada item a { dia, ingresos }
     return (Array.isArray(raw) ? raw : []).map((item) => {
-      const dia = item.dia || item.fecha || item.date || item.day || item.label || null;
+      const dia =
+        item.dia || item.fecha || item.date || item.day || item.label || null;
       const ingresos =
         typeof item.ingresos === "number"
           ? item.ingresos
@@ -133,24 +138,44 @@ export async function getTopProductos(limit = 5) {
   try {
     const raw = await fetchDashboardRaw();
     if (raw) {
-      const candidates = raw.top_productos || raw.top_productos_vendidos || raw.top_products || raw.top5 || [];
+      const candidates =
+        raw.top_productos ||
+        raw.top_productos_vendidos ||
+        raw.top_products ||
+        raw.top5 ||
+        [];
       if (Array.isArray(candidates) && candidates.length) {
         // Normalizar a la forma que espera TopProductosChart: { producto__nombre, unidades_vendidas, ingresos_generados }
         const norm = candidates.map((it) => {
-          const nombre = it.producto__nombre || (it.producto && (it.producto.nombre || it.producto.name)) || it.nombre || it.name || "Sin nombre";
+          const nombre =
+            it.producto__nombre ||
+            (it.producto && (it.producto.nombre || it.producto.name)) ||
+            it.nombre ||
+            it.name ||
+            "Sin nombre";
           const unidades =
             typeof it.unidades_vendidas === "number"
               ? it.unidades_vendidas
               : typeof it.unidades === "number"
               ? it.unidades
-              : Number(it.cantidad ?? it.cantidad_vendida ?? it.sold ?? it.total_vendido ?? 0);
+              : Number(
+                  it.cantidad ??
+                    it.cantidad_vendida ??
+                    it.sold ??
+                    it.total_vendido ??
+                    0
+                );
           const ingresos =
             typeof it.ingresos_generados === "number"
               ? it.ingresos_generados
               : typeof it.ingresos === "number"
               ? it.ingresos
               : Number(it.total ?? it.valor ?? it.monto ?? 0);
-          return { producto__nombre: nombre, unidades_vendidas: unidades, ingresos_generados: ingresos };
+          return {
+            producto__nombre: nombre,
+            unidades_vendidas: unidades,
+            ingresos_generados: ingresos,
+          };
         });
         return norm.slice(0, limit);
       }
@@ -181,13 +206,27 @@ export async function getInventarioBajo() {
         // Normalizar stock
         return raw.bajo_stock.map((it) => ({
           ...it,
-          stock: Number(it.stock ?? it.cantidad ?? it.quantity ?? it.existencias ?? it.disponible ?? 0),
+          stock: Number(
+            it.stock ??
+              it.cantidad ??
+              it.quantity ??
+              it.existencias ??
+              it.disponible ??
+              0
+          ),
         }));
       }
       if (Array.isArray(raw.inventario)) {
         return raw.inventario.map((it) => ({
           ...it,
-          stock: Number(it.stock ?? it.cantidad ?? it.quantity ?? it.existencias ?? it.disponible ?? 0),
+          stock: Number(
+            it.stock ??
+              it.cantidad ??
+              it.quantity ??
+              it.existencias ??
+              it.disponible ??
+              0
+          ),
         }));
       }
     }
@@ -198,7 +237,14 @@ export async function getInventarioBajo() {
       if (Array.isArray(resp.data)) {
         return resp.data.map((it) => ({
           ...it,
-          stock: Number(it.stock ?? it.cantidad ?? it.quantity ?? it.existencias ?? it.disponible ?? 0),
+          stock: Number(
+            it.stock ??
+              it.cantidad ??
+              it.quantity ??
+              it.existencias ??
+              it.disponible ??
+              0
+          ),
         }));
       }
     } catch (e) {

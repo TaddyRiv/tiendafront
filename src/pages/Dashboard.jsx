@@ -4,7 +4,10 @@ import VentasChart from "../components/dashboard/VentasChart";
 import TopProductosChart from "../components/dashboard/TopProductosChart";
 import InventarioChart from "../components/dashboard/InventarioChart";
 import InventoryTable from "../components/dashboard/InventoryTable";
-import { getDashboardData, getVentasDiarias } from "../services/dashboardService";
+import {
+  getDashboardData,
+  getVentasDiarias,
+} from "../services/dashboardService";
 import {
   getDashboardMetrics,
   getTopProductos,
@@ -33,9 +36,12 @@ const Dashboard = () => {
         // inyectar totales calculados (no sobreescribimos si backend ya tiene totales)
         dashboard.totales = dashboard.totales || {};
         dashboard.totales.ventas = dashboard.totales.ventas ?? metrics.ventas;
-        dashboard.totales.ingresos = dashboard.totales.ingresos ?? metrics.ingresos;
-        dashboard.totales.productos = dashboard.totales.productos ?? metrics.productos;
-        dashboard.totales.clientes = dashboard.totales.clientes ?? metrics.clientes;
+        dashboard.totales.ingresos =
+          dashboard.totales.ingresos ?? metrics.ingresos;
+        dashboard.totales.productos =
+          dashboard.totales.productos ?? metrics.productos;
+        dashboard.totales.clientes =
+          dashboard.totales.clientes ?? metrics.clientes;
 
         // Inventario: backend puede devolver 'inventario' o 'bajo_stock'
         if (!dashboard.inventario) {
@@ -47,8 +53,14 @@ const Dashboard = () => {
           let fechaInicio = undefined;
           let fechaFin = undefined;
           if (dashboard.periodo) {
-            fechaInicio = dashboard.periodo.fecha_inicio || dashboard.periodo.fechaInicio || undefined;
-            fechaFin = dashboard.periodo.fecha_fin || dashboard.periodo.fechaFin || undefined;
+            fechaInicio =
+              dashboard.periodo.fecha_inicio ||
+              dashboard.periodo.fechaInicio ||
+              undefined;
+            fechaFin =
+              dashboard.periodo.fecha_fin ||
+              dashboard.periodo.fechaFin ||
+              undefined;
           }
 
           // Si no vienen fechas del dashboard, obtener el mes actual por defecto desde el servicio
@@ -78,7 +90,11 @@ const Dashboard = () => {
         }
 
         // --- Si aún no hay datos, generar demo automático para mostrar gráficos ---
-        if ((!dashboard.ventas_diarias || dashboard.ventas_diarias.length === 0) && (!dashboard.totales || !dashboard.totales.ventas)) {
+        if (
+          (!dashboard.ventas_diarias ||
+            dashboard.ventas_diarias.length === 0) &&
+          (!dashboard.totales || !dashboard.totales.ventas)
+        ) {
           // generar 7 días demo consistentes
           const today = new Date();
           const demoV = Array.from({ length: 7 }).map((_, i) => {
@@ -93,11 +109,14 @@ const Dashboard = () => {
           setUseDemoVentas(true);
           // también inyectar totales derivados
           dashboard.totales = dashboard.totales || {};
-          dashboard.totales.ventas = dashboard.totales.ventas ?? demoV.reduce((s, v) => s + Number(v.ingresos || 0), 0);
-          dashboard.totales.ingresos = dashboard.totales.ingresos ?? dashboard.totales.ventas;
+          dashboard.totales.ventas =
+            dashboard.totales.ventas ??
+            demoV.reduce((s, v) => s + Number(v.ingresos || 0), 0);
+          dashboard.totales.ingresos =
+            dashboard.totales.ingresos ?? dashboard.totales.ventas;
         }
 
-        if ((!dashboard.inventario || dashboard.inventario.length === 0)) {
+        if (!dashboard.inventario || dashboard.inventario.length === 0) {
           const demoInv = [
             { id: 1, nombre: "Abrigo clásica", stock: 12 },
             { id: 2, nombre: "Gabardina premi", stock: 4 },
@@ -105,7 +124,10 @@ const Dashboard = () => {
             { id: 4, nombre: "Vestido imperme", stock: 8 },
             { id: 5, nombre: "Sombrero imperme", stock: 2 },
           ];
-          dashboard.inventario = demoInv.map(it => ({ ...it, stock: Number(it.stock) }));
+          dashboard.inventario = demoInv.map((it) => ({
+            ...it,
+            stock: Number(it.stock),
+          }));
           setDemoInventory(dashboard.inventario);
           setUseDemoInventory(true);
         }
@@ -137,10 +159,26 @@ const Dashboard = () => {
     }
   };
 
-  const ventasTotales = safeGet(data, "totales.ventas", safeGet(data, "totales.total_ventas", 0));
-  const ingresosTotales = safeGet(data, "totales.ingresos", safeGet(data, "totales.total_ingresos", 0));
-  const productosTotales = safeGet(data, "totales.productos", safeGet(data, "totales.total_productos", 0));
-  const clientesTotales = safeGet(data, "totales.clientes", safeGet(data, "totales.total_clientes", 0));
+  const ventasTotales = safeGet(
+    data,
+    "totales.ventas",
+    safeGet(data, "totales.total_ventas", 0)
+  );
+  const ingresosTotales = safeGet(
+    data,
+    "totales.ingresos",
+    safeGet(data, "totales.total_ingresos", 0)
+  );
+  const productosTotales = safeGet(
+    data,
+    "totales.productos",
+    safeGet(data, "totales.total_productos", 0)
+  );
+  const clientesTotales = safeGet(
+    data,
+    "totales.clientes",
+    safeGet(data, "totales.total_clientes", 0)
+  );
 
   const ventasDiarias = safeGet(data, "ventas_diarias", []);
   const topProductos = safeGet(data, "top_productos", []);
@@ -148,31 +186,68 @@ const Dashboard = () => {
 
   // Calcular valores derivados si el backend no entrega totales
   const ventasFromDiarias = Array.isArray(ventasDiarias)
-    ? ventasDiarias.reduce((acc, it) => acc + (Number(it.ingresos ?? it.total ?? it.valor ?? 0) || 0), 0)
+    ? ventasDiarias.reduce(
+        (acc, it) =>
+          acc + (Number(it.ingresos ?? it.total ?? it.valor ?? 0) || 0),
+        0
+      )
     : 0;
   const ingresosFromDiarias = ventasFromDiarias; // si no hay distinción, usamos lo mismo
 
-  const ventasDisplay = Number(ventasTotales) > 0 ? Number(ventasTotales) : ventasFromDiarias;
-  const ingresosDisplay = Number(ingresosTotales) > 0 ? Number(ingresosTotales) : ingresosFromDiarias;
+  const ventasDisplay =
+    Number(ventasTotales) > 0 ? Number(ventasTotales) : ventasFromDiarias;
+  const ingresosDisplay =
+    Number(ingresosTotales) > 0 ? Number(ingresosTotales) : ingresosFromDiarias;
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">
-      <h1 className="mb-6 text-2xl font-bold text-gray-700">Panel de control</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-700">
+        Panel de control
+      </h1>
 
       {loading ? (
         <div className="text-gray-600">Cargando dashboard...</div>
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-4">
-            <MetricCard icon="💸" label="Ventas" value={ventasDisplay} color="green" />
-            <MetricCard icon="🧾" label="Ingresos" value={ingresosDisplay} color="blue" />
-            <MetricCard icon="📦" label="Productos" value={productosTotales} color="yellow" />
-            <MetricCard icon="👥" label="Clientes" value={clientesTotales} color="red" />
+            <MetricCard
+              icon="💸"
+              label="Ventas"
+              value={ventasDisplay}
+              color="green"
+            />
+            <MetricCard
+              icon="🧾"
+              label="Ingresos"
+              value={ingresosDisplay}
+              color="blue"
+            />
+            <MetricCard
+              icon="📦"
+              label="Productos"
+              value={productosTotales}
+              color="yellow"
+            />
+            <MetricCard
+              icon="👥"
+              label="Clientes"
+              value={clientesTotales}
+              color="red"
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <VentasChart data={ (ventasDiarias && ventasDiarias.length) || (useDemoVentas && demoVentas.length) ? (ventasDiarias && ventasDiarias.length ? ventasDiarias : demoVentas) : [] } />
+              <VentasChart
+                data={
+                  (ventasDiarias && ventasDiarias.length) ||
+                  (useDemoVentas && demoVentas.length)
+                    ? ventasDiarias && ventasDiarias.length
+                      ? ventasDiarias
+                      : demoVentas
+                    : []
+                }
+              />
               {/* Mostrar botón para usar datos demo si no hay ventas reales */}
               {(!ventasDiarias || ventasDiarias.length === 0) && (
                 <div className="mt-2 text-sm text-gray-500">
@@ -185,7 +260,10 @@ const Dashboard = () => {
                         const demo = Array.from({ length: 7 }).map((_, i) => {
                           const d = new Date(today);
                           d.setDate(today.getDate() - (6 - i));
-                          return { dia: d.toISOString().slice(0, 10), ingresos: Math.floor(Math.random() * 8000) + 500 };
+                          return {
+                            dia: d.toISOString().slice(0, 10),
+                            ingresos: Math.floor(Math.random() * 8000) + 500,
+                          };
                         });
                         setDemoVentas(demo);
                         setUseDemoVentas(true);
@@ -195,7 +273,9 @@ const Dashboard = () => {
                       }
                     }}
                   >
-                    {useDemoVentas ? "Ocultar datos de ejemplo" : "Mostrar datos de ejemplo"}
+                    {useDemoVentas
+                      ? "Ocultar datos de ejemplo"
+                      : "Mostrar datos de ejemplo"}
                   </button>
                 </div>
               )}
@@ -209,7 +289,9 @@ const Dashboard = () => {
             {/* Si no hay inventario real, permitir mostrar demo temporal */}
             {(!inventario || inventario.length === 0) && (
               <div className="flex items-center justify-between mb-4">
-                <p className="text-gray-600">No hay datos de inventario disponibles</p>
+                <p className="text-gray-600">
+                  No hay datos de inventario disponibles
+                </p>
                 <div>
                   <button
                     className="px-3 py-1 mr-2 text-sm text-green-700 bg-green-100 rounded"
@@ -222,7 +304,9 @@ const Dashboard = () => {
                           { id: 4, nombre: "Vestido imperme", stock: 8 },
                           { id: 5, nombre: "Sombrero imperme", stock: 2 },
                         ];
-                        setDemoInventory(demo.map(it => ({ ...it, stock: Number(it.stock) })));
+                        setDemoInventory(
+                          demo.map((it) => ({ ...it, stock: Number(it.stock) }))
+                        );
                         setUseDemoInventory(true);
                       } else {
                         setUseDemoInventory(false);
@@ -230,15 +314,33 @@ const Dashboard = () => {
                       }
                     }}
                   >
-                    {useDemoInventory ? "Ocultar demo" : "Mostrar demo de inventario"}
+                    {useDemoInventory
+                      ? "Ocultar demo"
+                      : "Mostrar demo de inventario"}
                   </button>
                 </div>
               </div>
             )}
 
-            <InventarioChart data={ (inventario && inventario.length) ? inventario : (useDemoInventory ? demoInventory : []) } />
+            <InventarioChart
+              data={
+                inventario && inventario.length
+                  ? inventario
+                  : useDemoInventory
+                  ? demoInventory
+                  : []
+              }
+            />
             {/* Tabla detallada de inventario debajo del chart */}
-            <InventoryTable data={ (inventario && inventario.length) ? inventario : (useDemoInventory ? demoInventory : []) } />
+            <InventoryTable
+              data={
+                inventario && inventario.length
+                  ? inventario
+                  : useDemoInventory
+                  ? demoInventory
+                  : []
+              }
+            />
           </div>
         </>
       )}

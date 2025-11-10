@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import http from "../../services/http"; 
+import http from "../../services/http";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -40,10 +40,13 @@ const exportToPDF = (data, filename = "reporte.pdf") => {
       const first = arr[0] || {};
       columns = [];
       for (const k in first) {
-        if (Object.prototype.hasOwnProperty.call(first, k)) columns.push(String(k));
+        if (Object.prototype.hasOwnProperty.call(first, k))
+          columns.push(String(k));
       }
     }
-    columns = columns.map((c) => (c === null || c === undefined ? "" : String(c)));
+    columns = columns.map((c) =>
+      c === null || c === undefined ? "" : String(c)
+    );
 
     const rows = arr.map((obj) =>
       columns.map((c) => {
@@ -82,7 +85,9 @@ const exportToPDF = (data, filename = "reporte.pdf") => {
           columnStyles: {},
         });
       } else {
-        throw new Error("autoTable no está disponible (doc.autoTable y import default fallaron)");
+        throw new Error(
+          "autoTable no está disponible (doc.autoTable y import default fallaron)"
+        );
       }
     } catch (autoErr) {
       console.error("autoTable error:", autoErr);
@@ -108,16 +113,13 @@ const formatCell = (v, max = 300) => {
     try {
       // Safe stringify to avoid circular reference errors
       const seen = new WeakSet();
-      const s = JSON.stringify(
-        v,
-        (k, val) => {
-          if (typeof val === "object" && val !== null) {
-            if (seen.has(val)) return "[Circular]";
-            seen.add(val);
-          }
-          return val;
+      const s = JSON.stringify(v, (k, val) => {
+        if (typeof val === "object" && val !== null) {
+          if (seen.has(val)) return "[Circular]";
+          seen.add(val);
         }
-      );
+        return val;
+      });
       return s.length > max ? s.slice(0, max) + "…" : s;
     } catch (err) {
       try {
@@ -183,7 +185,6 @@ const Dinamico = () => {
       console.error(error);
     }
   };
-  
 
   // Enviar audio a la API /reportes/voz/
   const enviarAudioIA = async (audioBlob) => {
@@ -257,10 +258,11 @@ const Dinamico = () => {
           <button
             onClick={iniciarGrabacion}
             disabled={grabando}
-            className={`${grabando
-              ? "bg-red-500 animate-pulse"
-              : "bg-green-600 hover:bg-green-700"
-              } text-white px-4 py-2 rounded`}
+            className={`${
+              grabando
+                ? "bg-red-500 animate-pulse"
+                : "bg-green-600 hover:bg-green-700"
+            } text-white px-4 py-2 rounded`}
           >
             {grabando ? "🎙️ Grabando..." : "🎤 Hablar"}
           </button>
@@ -288,13 +290,17 @@ const Dinamico = () => {
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => exportToExcel(respuestaIA.datos, "reporte_ia.xlsx")}
+                    onClick={() =>
+                      exportToExcel(respuestaIA.datos, "reporte_ia.xlsx")
+                    }
                     className="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700"
                   >
-                    📗 Exportar Excel 
+                    📗 Exportar Excel
                   </button>
                   <button
-                    onClick={() => exportToPDF(respuestaIA.datos, "reporte_ia.pdf")}
+                    onClick={() =>
+                      exportToPDF(respuestaIA.datos, "reporte_ia.pdf")
+                    }
                     className="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700"
                   >
                     📄 Exportar PDF
@@ -314,7 +320,10 @@ const Dinamico = () => {
                         <thead className="bg-gray-100 border-b">
                           <tr>
                             {Object.keys(datosArray[0] || {}).map((key) => (
-                              <th key={key} className="px-3 py-2 font-semibold text-left">
+                              <th
+                                key={key}
+                                className="px-3 py-2 font-semibold text-left"
+                              >
                                 {key.replace(/_/g, " ").toUpperCase()}
                               </th>
                             ))}
@@ -336,7 +345,9 @@ const Dinamico = () => {
                   })()}
                 </div>
               ) : (
-                <div className="text-sm text-gray-500">Sin datos disponibles</div>
+                <div className="text-sm text-gray-500">
+                  Sin datos disponibles
+                </div>
               )}
             </div>
 
@@ -345,11 +356,12 @@ const Dinamico = () => {
               <h3 className="flex items-center gap-2 mb-2 font-semibold text-gray-700">
                 💬 Respuesta Natural
               </h3>
-              <div className="text-gray-800 whitespace-pre-line">{respuestaIA.respuesta}</div>
+              <div className="text-gray-800 whitespace-pre-line">
+                {respuestaIA.respuesta}
+              </div>
             </div>
           </div>
         )}
-
       </div>
 
       {/* 🔹 Constructor manual (opcional) */}
@@ -358,8 +370,8 @@ const Dinamico = () => {
           ⚙️ Constructor de Reportes Manual
         </h2>
         <p className="text-gray-500">
-          Aquí puedes seguir usando los filtros, métricas y agrupaciones manuales.
-          (Puedes integrarlo con la IA si lo deseas más adelante).
+          Aquí puedes seguir usando los filtros, métricas y agrupaciones
+          manuales. (Puedes integrarlo con la IA si lo deseas más adelante).
         </p>
       </div>
     </div>
