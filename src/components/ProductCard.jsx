@@ -6,14 +6,16 @@ const ProductCard = ({ producto }) => {
 
   const handleAddToCart = () => {
     addToCart(producto);
-    // Opcional: mostrar notificación
-    //alert(`✅ ${producto.nombre} agregado al carrito`);
   };
-
+    const BASE_URL = process.env.REACT_APP_API_URL.replace(/\/api$/, "");
   return (
     <div className="p-4 transition duration-300 bg-white rounded-lg shadow-md hover:shadow-lg">
       <img
-        src={producto.imagen || "https://via.placeholder.com/300x200"}
+        src={
+          producto.foto?.startsWith("http")
+            ? producto.foto
+            : `${BASE_URL}/${producto.foto}`
+        }
         alt={producto.nombre}
         className="object-cover w-full h-48 mb-3 rounded-md"
       />
@@ -25,7 +27,7 @@ const ProductCard = ({ producto }) => {
         <span className="text-lg font-bold text-blue-600">
           Bs. {producto.precio}
         </span>
-        <button 
+        <button
           onClick={handleAddToCart}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm"
         >

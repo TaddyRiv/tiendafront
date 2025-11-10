@@ -1,6 +1,7 @@
 import React from "react";
 import { X, Plus, Minus, Trash2, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const CartSidebar = () => {
   const {
@@ -13,7 +14,14 @@ const CartSidebar = () => {
     setIsCartOpen,
   } = useCart();
 
+  const navigate = useNavigate();
+
   if (!isCartOpen) return null;
+
+  const handleCheckout = () => {
+    setIsCartOpen(false); // cerramos el carrito visualmente
+    navigate("/checkout"); // redirige a la página de StripeCheckout
+  };
 
   return (
     <>
@@ -94,7 +102,7 @@ const CartSidebar = () => {
 
                   <div className="mt-2 text-right">
                     <span className="text-sm text-gray-600">Subtotal: </span>
-                    <span className="font-bold">
+                    <span className="font-bold">  
                       Bs. {(item.precio * item.quantity).toFixed(2)}
                     </span>
                   </div>
@@ -115,10 +123,7 @@ const CartSidebar = () => {
             </div>
 
             <button
-              onClick={() => {
-                alert("Procediendo al checkout...");
-                // Aquí el otro dev conectará con el backend
-              }}
+              onClick={handleCheckout}
               className="w-full py-3 mb-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             >
               Proceder al Pago
@@ -134,19 +139,20 @@ const CartSidebar = () => {
         )}
       </div>
 
-      <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
-      `}</style>
+      <style>{`
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+`}</style>
+
     </>
   );
 };
