@@ -1,5 +1,6 @@
 // src/pages/admin/ventas/VentasPage.jsx
 import React, { useEffect, useState } from "react";
+import CuotasCreditoModal from "./CuotasCreditoModal"; 
 import {
   getVentas,
   createVenta,
@@ -15,6 +16,7 @@ import VentaDetallesModal from "./VentaDetallesModal";
 import Swal from "sweetalert2";
 
 export default function VentasPage() {
+  const [creditoModal, setCreditoModal] = useState(null)
   const [ventas, setVentas] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [productos, setProductos] = useState([]);
@@ -22,7 +24,7 @@ export default function VentasPage() {
   const [ventaDetalles, setVentaDetalles] = useState([]);
   const [detalleModal, setDetalleModal] = useState(false);
 
-  // 🔹 Cargar todos los datos al montar
+
   useEffect(() => {
     fetchVentas();
     fetchClientes();
@@ -30,7 +32,7 @@ export default function VentasPage() {
     fetchEmpleados();
   }, []);
 
-  // 📦 Obtener todas las ventas
+
   const fetchVentas = async () => {
     try {
       const data = await getVentas();
@@ -134,6 +136,7 @@ export default function VentasPage() {
         clientes={clientes}
         onVerDetalles={handleVerDetalles}
         onDelete={handleDeleteVenta}
+        onVerCredito={(id) => setCreditoModal(id)}
       />
 
       {/* ✅ Modal de detalles */}
@@ -141,6 +144,12 @@ export default function VentasPage() {
         <VentaDetallesModal
           detalles={ventaDetalles}
           onClose={() => setDetalleModal(false)}
+        />
+      )}
+      {creditoModal && (
+        <CuotasCreditoModal
+          ventaId={creditoModal}
+          onClose={() => setCreditoModal(null)}
         />
       )}
     </div>

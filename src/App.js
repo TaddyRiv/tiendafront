@@ -37,11 +37,13 @@ function App() {
             <Route path="/mis-compras" element={<MisComprasPage />} />
 
             {/* 🔒 RUTAS ADMIN PROTEGIDAS */}
-            {/* Panel administrativo */}
+
              <Route path="/admin" element={
-              <AdminLayout>
-                <Dashboard />
-              </AdminLayout>
+              <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
+                <AdminLayout>
+                  <Dashboard />
+                </AdminLayout>
+              </ProtectedRoute>
             } />
             <Route
               path="/admin/usuarios"
