@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import http from "../../services/http"; 
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 // Helpers de exportación
 const exportToExcel = (data, filename = "reporte.xlsx") => {
@@ -33,34 +33,70 @@ const exportToPDF = (data, filename = "reporte.pdf") => {
     }
 
     const arr = Array.isArray(data) ? data : [data];
-    const columns = Object.keys(arr[0] || {});
+    // Normalizar columnas y filas: asegurar que las columnas sean strings y las celdas también
+    let columns = Object.keys(arr[0] || {});
+    if (!Array.isArray(columns) || columns.length === 0) {
+      // intentar inferir columnas a partir de la primera fila iterando sus claves
+      const first = arr[0] || {};
+      columns = [];
+      for (const k in first) {
+        if (Object.prototype.hasOwnProperty.call(first, k)) columns.push(String(k));
+      }
+    }
+    columns = columns.map((c) => (c === null || c === undefined ? "" : String(c)));
+
     const rows = arr.map((obj) =>
       columns.map((c) => {
         const v = obj[c];
-        if (v === null || v === undefined) return "";
-        if (typeof v === "object") return JSON.stringify(v);
-        return String(v);
+        // formatCell siempre devuelve string seguro
+        return formatCell(v, 1000);
       })
     );
+
+    // Debug: logear una muestra para inspección en consola si algo falla
+    console.debug("exportToPDF: columns:", columns);
+    console.debug("exportToPDF: sample rows:", rows.slice(0, 3));
 
     const doc = new jsPDF();
     doc.text("Reporte IA - Datos Generados", 14, 15);
     // autoTable
     // head expects array of arrays
-    doc.autoTable({
-      head: [columns],
-      body: rows,
-      startY: 25,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [240, 240, 240] },
-      columnStyles: {},
-    });
+    try {
+      if (typeof doc.autoTable === "function") {
+        doc.autoTable({
+          head: [columns],
+          body: rows,
+          startY: 25,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [240, 240, 240] },
+          columnStyles: {},
+        });
+      } else if (typeof autoTable === "function") {
+        // algunos bundles exponen autoTable como función default
+        autoTable(doc, {
+          head: [columns],
+          body: rows,
+          startY: 25,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [240, 240, 240] },
+          columnStyles: {},
+        });
+      } else {
+        throw new Error("autoTable no está disponible (doc.autoTable y import default fallaron)");
+      }
+    } catch (autoErr) {
+      console.error("autoTable error:", autoErr);
+      // rethrow to ser atrapado por el catch exterior y mostrar alert genérico
+      throw autoErr;
+    }
 
     const outName = filename.endsWith(".pdf") ? filename : `${filename}.pdf`;
     doc.save(outName);
   } catch (err) {
+    // Loguear con detalle y sugerir pasar por consola
     console.error("Error exportando a PDF:", err);
-    alert("Error al exportar a PDF");
+    // mostrar mensaje conciso al usuario
+    alert("Error al exportar a PDF. Revisa la consola para más detalles.");
   }
 };
 
@@ -70,10 +106,25 @@ const formatCell = (v, max = 300) => {
   if (v === null || v === undefined) return "";
   if (typeof v === "object") {
     try {
-      const s = JSON.stringify(v);
+      // Safe stringify to avoid circular reference errors
+      const seen = new WeakSet();
+      const s = JSON.stringify(
+        v,
+        (k, val) => {
+          if (typeof val === "object" && val !== null) {
+            if (seen.has(val)) return "[Circular]";
+            seen.add(val);
+          }
+          return val;
+        }
+      );
       return s.length > max ? s.slice(0, max) + "…" : s;
     } catch (err) {
-      return String(v);
+      try {
+        return String(v);
+      } catch (e) {
+        return "[Objeto]";
+      }
     }
   }
   if (typeof v === "boolean") return v ? "Sí" : "No";
@@ -176,21 +227,21 @@ const Dinamico = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen space-y-8">
+    <div className="min-h-screen p-6 space-y-8 bg-gray-50">
       <h1 className="text-2xl font-bold text-gray-700">
         📊 Reporte Dinámico + Asistente IA
       </h1>
 
       {/* 🔹 Sección IA */}
-      <div className="bg-white rounded-lg shadow p-5 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+      <div className="p-5 space-y-4 bg-white rounded-lg shadow">
+        <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-700">
           🧠 Asistente Inteligente
         </h2>
 
-        <div className="flex flex-col md:flex-row gap-3">
+        <div className="flex flex-col gap-3 md:flex-row">
           <input
             type="text"
-            className="flex-1 border rounded-md p-2"
+            className="flex-1 p-2 border rounded-md"
             placeholder="Ej: Ventas de este mes, productos más vendidos..."
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
@@ -198,7 +249,7 @@ const Dinamico = () => {
           <button
             onClick={enviarTextoIA}
             disabled={loadingIA}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
           >
             {loadingIA ? "Procesando..." : "Enviar Texto"}
           </button>
@@ -215,36 +266,36 @@ const Dinamico = () => {
           </button>
         </div>
 
-        {errorIA && <div className="text-red-600 mt-2">{errorIA}</div>}
+        {errorIA && <div className="mt-2 text-red-600">{errorIA}</div>}
 
         {respuestaIA && (
           <div className="mt-6 space-y-8">
             {/* 🧠 Interpretación */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <div className="p-4 bg-white rounded-lg shadow">
+              <h3 className="flex items-center gap-2 mb-2 font-semibold text-gray-700">
                 <span>🧩 Interpretación de la IA</span>
               </h3>
-              <pre className="bg-gray-100 rounded p-2 overflow-x-auto text-sm">
+              <pre className="p-2 overflow-x-auto text-sm bg-gray-100 rounded">
                 {JSON.stringify(respuestaIA.interpretacion, null, 2)}
               </pre>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+            <div className="p-4 bg-white rounded-lg shadow">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="flex items-center gap-2 font-semibold text-gray-700">
                   <span>📊 Datos del Reporte</span>
                 </h3>
 
                 <div className="flex gap-2">
                   <button
                     onClick={() => exportToExcel(respuestaIA.datos, "reporte_ia.xlsx")}
-                    className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
+                    className="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700"
                   >
                     📗 Exportar Excel 
                   </button>
                   <button
                     onClick={() => exportToPDF(respuestaIA.datos, "reporte_ia.pdf")}
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
+                    className="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700"
                   >
                     📄 Exportar PDF
                   </button>
@@ -263,7 +314,7 @@ const Dinamico = () => {
                         <thead className="bg-gray-100 border-b">
                           <tr>
                             {Object.keys(datosArray[0] || {}).map((key) => (
-                              <th key={key} className="text-left px-3 py-2 font-semibold">
+                              <th key={key} className="px-3 py-2 font-semibold text-left">
                                 {key.replace(/_/g, " ").toUpperCase()}
                               </th>
                             ))}
@@ -285,16 +336,16 @@ const Dinamico = () => {
                   })()}
                 </div>
               ) : (
-                <div className="text-gray-500 text-sm">Sin datos disponibles</div>
+                <div className="text-sm text-gray-500">Sin datos disponibles</div>
               )}
             </div>
 
             {/* 💬 Respuesta natural */}
-            <div className="bg-green-50 rounded-lg shadow p-4">
-              <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <div className="p-4 rounded-lg shadow bg-green-50">
+              <h3 className="flex items-center gap-2 mb-2 font-semibold text-gray-700">
                 💬 Respuesta Natural
               </h3>
-              <div className="whitespace-pre-line text-gray-800">{respuestaIA.respuesta}</div>
+              <div className="text-gray-800 whitespace-pre-line">{respuestaIA.respuesta}</div>
             </div>
           </div>
         )}
@@ -302,8 +353,8 @@ const Dinamico = () => {
       </div>
 
       {/* 🔹 Constructor manual (opcional) */}
-      <div className="bg-white rounded-lg shadow p-5">
-        <h2 className="text-lg font-semibold text-gray-700 mb-3">
+      <div className="p-5 bg-white rounded-lg shadow">
+        <h2 className="mb-3 text-lg font-semibold text-gray-700">
           ⚙️ Constructor de Reportes Manual
         </h2>
         <p className="text-gray-500">
