@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminLayout from "./layouts/AdminLayout";
+import Dashboard from "./pages/Dashboard";
 import Usuarios from "./pages/admin/Usuarios";
 import Reportes from "./pages/admin/Reportes";
 import Dinamico from "./pages/admin/Dinamico";
@@ -36,6 +37,12 @@ function App() {
             <Route path="/mis-compras" element={<MisComprasPage />} />
 
             {/* 🔒 RUTAS ADMIN PROTEGIDAS */}
+            {/* Panel administrativo */}
+             <Route path="/admin" element={
+              <AdminLayout>
+                <Dashboard />
+              </AdminLayout>
+            } />
             <Route
               path="/admin/usuarios"
               element={
